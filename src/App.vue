@@ -17,7 +17,10 @@
     </div>
     <div v-for="kata in filteredKatas" :key="kata.githubUrl" class="kata">
       <h3>{{kata.kataName}}</h3>
-      <div class="kyu">{{!kata.kyu ? '???' : Math.abs(kata.kyu)}} kyu</div>
+      <div
+        class="kyu"
+        @click="singleOutKyu(kata.kyu)"
+        >{{!kata.kyu ? '???' : Math.abs(kata.kyu)}} kyu</div>
       <div class="episode">Episode - {{kata.episodeNum}}</div>
       <a :href="kata.video" target="_blank" rel="noopener">Watch on YouTube</a>
       <a :href="kata.githubUrl" target="_blank" rel="noopener">View Solution on Github</a>
@@ -33,6 +36,10 @@ const kyus = [...new Set(katas.map(kata => kata.kyu).sort())];
 
 const selectedKyus = kyus.reduce((all, kyu) => (all[kyu] = true, all), {});
 
+let singledOutKyu = false;
+let singledOutKyuKey;
+const selectedKyusMemory = Object.assign({}, selectedKyus);
+
 export default {
   name: 'app',
   data: () => ({
@@ -42,13 +49,54 @@ export default {
     selectedKyus,
   }),
   methods: {
-    toggleKyu(kyu) {
-      this.selectedKyus[kyu] = !this.selectedKyus[kyu];
+    toggleKyu(_kyu, state = !this.selectedKyus[_kyu], singledOut = false) {
+      const kyu = '' + _kyu;
+      if(!singledOut) {
+        if(singledOutKyu && singledOutKyuKey === kyu) {
+          singledOutKyu = false;
+          return this.returnToMemory();
+        }
+        else {
+          singledOutKyu = false;
+        }
+      }
+      const currentState = this.selectedKyus[kyu];
+      this.selectedKyus[kyu] = state;
+      return currentState !== state;
     },
+    singleOutKyu(_kyu) {
+      const kyu = '' + _kyu;
+      const tempMemory = Object.assign({}, this.selectedKyus);
+      let stateChanged = false;
+      for(const key in this.selectedKyus) {
+        if(key !== kyu) {
+          const didChange = this.toggleKyu(key, false, true);
+          stateChanged = stateChanged || didChange;
+        }
+      }
+      if(stateChanged) {
+        singledOutKyu = true;
+        singledOutKyuKey = kyu;
+        Object.assign(selectedKyusMemory, tempMemory);
+      }
+      else {
+        this.returnToMemory();
+      }
+    },
+    returnToMemory() {
+      let stateChanged = false;
+      for(const key in selectedKyusMemory) {
+        let didChange = this.toggleKyu(key, selectedKyusMemory[key]);
+        stateChanged = stateChanged || didChange;
+      }
+      return stateChanged;
+    }
   },
   computed: {
     filteredKatas() {
-      if (!this.search.trim()) return this.katas.filter(kata => this.selectedKyus[kata.kyu]);
+      if (!this.search.trim()) {
+        return this.katas.filter(kata => this.selectedKyus[kata.kyu]);
+      }
       const lowerSearch = this.search.toLowerCase();
       return this.katas.filter(kata => this.selectedKyus[kata.kyu] && kata.kataName.toLowerCase().includes(lowerSearch));
     },
