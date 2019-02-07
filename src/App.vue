@@ -32,63 +32,99 @@
 <script>
 import katas from './katas.json';
 
+// Array of sorted, unique kyu values
 const kyus = [...new Set(katas.map(kata => kata.kyu).sort())];
 
+// An object representing the kyu toggles
 const selectedKyus = kyus.reduce((all, kyu) => (all[kyu] = true, all), {});
 
+// Has a single kyu been singled out?
 let singledOutKyu = false;
+// The key of the currently singled out kyu
 let singledOutKyuKey;
+// A memory of the previously selected key
 const selectedKyusMemory = Object.assign({}, selectedKyus);
 
 export default {
   name: 'app',
+  // Data available in/from the template
   data: () => ({
     search: '',
     katas,
     kyus,
     selectedKyus,
   }),
+  // Functions available in the template
   methods: {
+    // Toggle a kyu on click or set the state for a kyu
     toggleKyu(_kyu, state = !this.selectedKyus[_kyu], singledOut = false) {
+      // Stringify the kyu value (numbers and null)
       const kyu = '' + _kyu;
+      // Is not part of a singling-out (i.e. clicking on the kyu-list)
       if(!singledOut) {
+        // Is this kyu the last one to be singled out?
         if(singledOutKyu && singledOutKyuKey === kyu) {
+          // No kyu is singled out anymore
           singledOutKyu = false;
+          // Return the kyu list to the previous memory
           return this.returnToMemory();
         }
         else {
+          // No kyu is singled out anymore
           singledOutKyu = false;
         }
       }
+      // The current state of the kyu prior to assignment
       const currentState = this.selectedKyus[kyu];
       this.selectedKyus[kyu] = state;
+      // Has the current state been changed?
       return currentState !== state;
     },
+    // Single out a specific kyu
     singleOutKyu(_kyu) {
+      // Stringify the kyu value (numbers and null)
       const kyu = '' + _kyu;
+      // Remember the current state before possibly altering it
       const tempMemory = Object.assign({}, this.selectedKyus);
+      // Will be true if at least one change is made
       let stateChanged = false;
+      // Loop over all kyu states
       for(const key in this.selectedKyus) {
+        // This key is not the kyu that is to be singled-out
         if(key !== kyu) {
+          // Disable this kyu
           const didChange = this.toggleKyu(key, false, true);
+          // Has at least one change been made?
           stateChanged = stateChanged || didChange;
         }
       }
+      // If a state change has been made
       if(stateChanged) {
+        // Successfully singled out one kyu
         singledOutKyu = true;
+        // Remember the currently singled-out kyu
         singledOutKyuKey = kyu;
+        // Commit the temporary memory
         Object.assign(selectedKyusMemory, tempMemory);
       }
+      // No change was made
       else {
+        // Reassign the old memory
         this.returnToMemory();
       }
     },
+    // Change all kyu to their state in the memory
     returnToMemory() {
+      // Will be true if at least one change is made
       let stateChanged = false;
+      // Loop over all kyu states
       for(const key in selectedKyusMemory) {
+        // Reassign this kyu
         let didChange = this.toggleKyu(key, selectedKyusMemory[key]);
+          // Has at least one change been made?
         stateChanged = stateChanged || didChange;
       }
+      // Have any of the states been changed?
       return stateChanged;
     }
   },
