@@ -128,12 +128,18 @@ export default {
       return stateChanged;
     }
   },
+  // Special getter functions available in the template
   computed: {
+    // Filter out katas based on search and kyu selection
     filteredKatas() {
+      // If the search is empty
       if (!this.search.trim()) {
+        // Filter only by selected kyu
         return this.katas.filter(kata => this.selectedKyus[kata.kyu]);
       }
+      // Case-insensitive search
       const lowerSearch = this.search.toLowerCase();
+      // Filter by selected kyu and basic string inclusion of the search value
       return this.katas.filter(kata => this.selectedKyus[kata.kyu] && kata.kataName.toLowerCase().includes(lowerSearch));
     },
   },
