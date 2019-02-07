@@ -1,19 +1,24 @@
 <template>
   <div id="app">
     <h1>Code Wars Code Katas with CJ</h1>
-    <input v-model="search">
-    <br>
-    <div
-      v-for="kyu in kyus"
-      :key="kyu"
-      class="kyu"
-      :class="{
-        selected: selectedKyus[kyu]
-      }"
-      @click="toggleKyu(kyu)">{{!kyu ? '???' : Math.abs(kyu)}}</div>
+    <div class="input">
+      <input v-model="search" placeholder="filter">
+      <div class="kyu-list">
+        <div>Kyu:</div>
+        <div
+          v-for="kyu in kyus"
+          :key="kyu"
+          class="kyu"
+          :class="{
+            selected: selectedKyus[kyu]
+          }"
+          @click="toggleKyu(kyu)">{{!kyu ? '???' : Math.abs(kyu)}}</div>
+      </div>
+    </div>
     <div v-for="kata in filteredKatas" :key="kata.githubUrl" class="kata">
-      <h3>{{!kata.kyu ? '???' : Math.abs(kata.kyu)}} kyu - {{kata.kataName}}</h3>
-      <small>Episode - {{kata.episodeNum}}</small>
+      <h3>{{kata.kataName}}</h3>
+      <div class="kyu">{{!kata.kyu ? '???' : Math.abs(kata.kyu)}} kyu</div>
+      <div class="episode">Episode - {{kata.episodeNum}}</div>
       <a :href="kata.video" target="_blank" rel="noopener">Watch on YouTube</a>
       <a :href="kata.githubUrl" target="_blank" rel="noopener">View Solution on Github</a>
       <a v-if="kata.kyu" :href="`https://www.codewars.com/kata/${kata.slug}`" target="_blank" rel="noopener">Solve on Code Wars</a>
@@ -52,57 +57,152 @@ export default {
 </script>
 
 <style>
-#app {
-  font-family: sans-serif;
-}
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:400|Ubuntu:700");
 
+body,
+.input,
 input {
-  width: 80%;
-  padding: 0.5em;
-  margin: 0.5em;
+  background: white;
 }
 
-@import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400|Ubuntu:700");
+body,
+input {
+  font-family: "Open Sans", sans-serif;
+}
 
 body {
-  font-family: "Open Sans", sans-serif;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 a {
   color: hsl(0, 70%, 40%);
 }
 
+#app {
+  padding: 0.5em;
+}
+
+h1, h2, h3, h4, h5, h6,
+.kyu {
+  font-family: "Ubuntu", sans-serif;
+  font-weight: 700;
+}
+
+h1 {
+  cursor: default;
+}
+
+.input,
+input,
+.kyu {
+  border: 1px solid hsl(0, 70%, 40%);
+  border-radius: 2px;
+}
+
+.input {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5em;
+  border-width: 0;
+  border-bottom-width: 3px;
+  border-top-width: 1px;
+  border-radius: 0;
+  position: -webkit-sticky;
+  position: sticky;
+  top: -1px;
+  z-index: 10;
+}
+
+input {
+  font-size: 1em;
+  padding: 0.5em;
+  margin: 0.5em;
+}
+
+.kyu-list {
+  padding: 0.2em;
+  padding-left: 1.5em;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.kyu-list > div:first-child {
+  margin-right: 1em;
+}
+
+.kyu {
+  padding: 0.35em 0.7em;
+  margin: 0.25em;
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  transition: 100ms background;
+}
+
+.selected {
+  background: hsl(0, 70%, 40%);
+  color: white;
+}
+
 .kata {
   padding: 1em;
+  padding-right: 7em;
+  padding-bottom: 1.5em;
+  position: relative;
 }
 
 .kata:not(:last-child) {
   border-bottom: 2px solid hsl(0, 70%, 40%);
 }
 
+.kata h3 {
+  margin-top: 0.25em;
+}
+
 .kata a {
   display: block;
 }
 
-h3 {
-  font-family: "Ubuntu", sans-serif;
+.kata .kyu {
+  position: absolute;
+  top: 1em;
+  right: 1em;
 }
 
-small {
-  display: block;
-  margin-bottom: 0.5em;
+.episode {
+  font-size: 14px;
+  margin-bottom: 1em;
 }
 
-.kyu {
-  display: inline-block;
-  padding: 0.5em;
-  margin: 0.25em;
-  border: 1px solid hsl(0, 70%, 40%);
-  cursor: pointer;
-}
+@media (max-width: 600px) {
+  #app {
+    padding: 0;
+  }
 
-.selected {
-  background: hsl(0, 70%, 40%);
-  color: white;
+  h1 {
+    font-size: 5.5vw;
+    text-align: center;
+  }
+
+  .input {
+    padding: 0.25em;
+  }
+
+  .kyu-list {
+    padding-left: 1em;
+  }
+
+  .kyu-list > div:first-child {
+    margin-right: 0.5em;
+  }
+
+  .kyu {
+    margin: 0.1em;
+  }
 }
 </style>
