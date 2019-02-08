@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <h1>Code Wars Code Katas with CJ</h1>
+    <h1>Codewars Code Katas with CJ</h1>
     <div class="input">
       <input v-model="search" placeholder="filter">
       <div class="kyu-list">
@@ -24,7 +24,7 @@
       <div class="episode">Episode - {{kata.episodeNum}}</div>
       <a :href="kata.video" target="_blank" rel="noopener">Watch on YouTube</a>
       <a :href="kata.githubUrl" target="_blank" rel="noopener">View Solution on Github</a>
-      <a v-if="kata.kyu" :href="`https://www.codewars.com/kata/${kata.slug}`" target="_blank" rel="noopener">Solve on Code Wars</a>
+      <a v-if="kata.kyu" :href="`https://www.codewars.com/kata/${kata.slug}`" target="_blank" rel="noopener">Solve on Codewars</a>
     </div>
   </div>
 </template>
